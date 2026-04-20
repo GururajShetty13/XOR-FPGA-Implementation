@@ -1,0 +1,32 @@
+# Vivado Floating-Point Implementation Notes
+
+## Purpose
+This Vivado setup is used to simulate and validate the floating-point HLS implementation of the XOR model.
+
+## Tool versions
+- Vivado 2024.1
+- Vitis HLS 2024.1
+
+## Target device
+- Part: xc7z020clg484-3
+
+## Testbench behavior
+- Reset applied at start
+- Start pulse held high for multiple cycles in floating-point simulation
+- XOR training order:
+  - (0,0) -> 0
+  - (0,1) -> 1
+  - (1,0) -> 1
+  - (1,1) -> 0
+
+## Simulation observations
+- Floating-point simulation required larger timeout values than fixed-point.
+- The FSM initially stayed in IDLE when the start pulse was too short.
+- This was improved by using a longer start pulse in the VHDL testbench.
+- dbg_phase_text was displayed as ASCII in waveform.
+- Final weights were printed in hexadecimal IEEE-754 format.
+
+
+## Result summary
+The floating-point Vivado results matched the TensorFlow floating-point values closely.
+This version is currently the best reference for Python-vs-HLS comparison.
