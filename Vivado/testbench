@@ -1,0 +1,261 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity tb_design_1 is
+end tb_design_1;
+
+architecture behavior of tb_design_1 is
+
+    signal ap_clk_0         : std_logic := '0';
+    signal rst_r_0          : std_logic_vector(0 downto 0) := "0";
+
+    signal dbg_b1_0_0       : std_logic_vector(31 downto 0);
+    signal dbg_b2_0         : std_logic_vector(31 downto 0);
+    signal dbg_phase_0      : std_logic_vector(2 downto 0);
+    signal dbg_phase_text_0 : std_logic_vector(63 downto 0);
+    signal dbg_sample_id_0  : std_logic_vector(1 downto 0);
+    signal dbg_w1_00_0      : std_logic_vector(31 downto 0);
+    signal dbg_w1_10_0      : std_logic_vector(31 downto 0);
+    signal dbg_w2_0_0       : std_logic_vector(31 downto 0);
+
+    signal done_0           : std_logic_vector(0 downto 0);
+    signal init_mode_0      : std_logic_vector(0 downto 0) := "0";
+    signal pred_out_0       : std_logic_vector(0 downto 0);
+    signal start_r_0        : std_logic_vector(0 downto 0) := "0";
+    signal train_mode_0     : std_logic_vector(0 downto 0) := "0";
+
+    signal x1_0             : std_logic_vector(31 downto 0) := (others => '0');
+    signal x2_0             : std_logic_vector(31 downto 0) := (others => '0');
+    signal y_out_0          : std_logic_vector(31 downto 0);
+    signal y_true_0         : std_logic_vector(31 downto 0) := (others => '0');
+
+    constant CLK_PERIOD     : time := 10 ns;
+
+    constant F_0_0 : std_logic_vector(31 downto 0) := x"00000000";
+    constant F_1_0 : std_logic_vector(31 downto 0) := x"3F800000";
+
+    function hex_char(n : std_logic_vector(3 downto 0)) return character is
+    begin
+        case n is
+            when "0000" => return '0';
+            when "0001" => return '1';
+            when "0010" => return '2';
+            when "0011" => return '3';
+            when "0100" => return '4';
+            when "0101" => return '5';
+            when "0110" => return '6';
+            when "0111" => return '7';
+            when "1000" => return '8';
+            when "1001" => return '9';
+            when "1010" => return 'A';
+            when "1011" => return 'B';
+            when "1100" => return 'C';
+            when "1101" => return 'D';
+            when "1110" => return 'E';
+            when others => return 'F';
+        end case;
+    end function;
+
+    function slv32_to_hex(slv : std_logic_vector(31 downto 0)) return string is
+        variable result : string(1 to 8);
+    begin
+        result(1) := hex_char(slv(31 downto 28));
+        result(2) := hex_char(slv(27 downto 24));
+        result(3) := hex_char(slv(23 downto 20));
+        result(4) := hex_char(slv(19 downto 16));
+        result(5) := hex_char(slv(15 downto 12));
+        result(6) := hex_char(slv(11 downto 8));
+        result(7) := hex_char(slv(7 downto 4));
+        result(8) := hex_char(slv(3 downto 0));
+        return result;
+    end function;
+
+    function slv64_to_ascii(slv : std_logic_vector(63 downto 0)) return string is
+        variable result : string(1 to 8);
+        variable byte_v : integer;
+    begin
+        for i in 0 to 7 loop
+            byte_v := to_integer(unsigned(slv(63 - i*8 downto 56 - i*8)));
+            if (byte_v >= 32) and (byte_v <= 126) then
+                result(i+1) := character'val(byte_v);
+            else
+                result(i+1) := '.';
+            end if;
+        end loop;
+        return result;
+    end function;
+
+    procedure print_debug_values(
+        constant tag : in string
+    ) is
+    begin
+        report tag &
+               " | phase=" & integer'image(to_integer(unsigned(dbg_phase_0))) &
+               " phase_text=" & slv64_to_ascii(dbg_phase_text_0) &
+               " sample_id=" & integer'image(to_integer(unsigned(dbg_sample_id_0))) &
+               " y_out=0x" & slv32_to_hex(y_out_0) &
+               " pred=" & integer'image(to_integer(unsigned(pred_out_0))) &
+               " W1_00=0x" & slv32_to_hex(dbg_w1_00_0) &
+               " W1_10=0x" & slv32_to_hex(dbg_w1_10_0) &
+               " b1_0=0x" & slv32_to_hex(dbg_b1_0_0) &
+               " W2_0=0x" & slv32_to_hex(dbg_w2_0_0) &
+               " b2=0x" & slv32_to_hex(dbg_b2_0);
+    end procedure;
+
+begin
+
+    uut: entity work.design_1_wrapper
+        port map (
+            ap_clk_0         => ap_clk_0,
+            dbg_b1_0_0       => dbg_b1_0_0,
+            dbg_b2_0         => dbg_b2_0,
+            dbg_phase_0      => dbg_phase_0,
+            dbg_phase_text_0 => dbg_phase_text_0,
+            dbg_sample_id_0  => dbg_sample_id_0,
+            dbg_w1_00_0      => dbg_w1_00_0,
+            dbg_w1_10_0      => dbg_w1_10_0,
+            dbg_w2_0_0       => dbg_w2_0_0,
+            done_0           => done_0,
+            init_mode_0      => init_mode_0,
+            pred_out_0       => pred_out_0,
+            rst_r_0          => rst_r_0,
+            start_r_0        => start_r_0,
+            train_mode_0     => train_mode_0,
+            x1_0             => x1_0,
+            x2_0             => x2_0,
+            y_out_0          => y_out_0,
+            y_true_0         => y_true_0
+        );
+
+    clk_process : process
+    begin
+        while true loop
+            ap_clk_0 <= '0';
+            wait for CLK_PERIOD/2;
+            ap_clk_0 <= '1';
+            wait for CLK_PERIOD/2;
+        end loop;
+    end process;
+
+    stim_proc : process
+
+        procedure run_tx(
+            constant init_v  : in std_logic_vector(0 downto 0);
+            constant train_v : in std_logic_vector(0 downto 0);
+            constant x1_v    : in std_logic_vector(31 downto 0);
+            constant x2_v    : in std_logic_vector(31 downto 0);
+            constant yt_v    : in std_logic_vector(31 downto 0);
+            constant tag     : in string
+        ) is
+            variable timeout : integer := 0;
+        begin
+            init_mode_0  <= init_v;
+            train_mode_0 <= train_v;
+            x1_0         <= x1_v;
+            x2_0         <= x2_v;
+            y_true_0     <= yt_v;
+
+            -- settle inputs
+            wait until rising_edge(ap_clk_0);
+            wait until rising_edge(ap_clk_0);
+
+            -- hold start high for multiple cycles
+            start_r_0 <= "1";
+            wait until rising_edge(ap_clk_0);
+            wait until rising_edge(ap_clk_0);
+            wait until rising_edge(ap_clk_0);
+            wait until rising_edge(ap_clk_0);
+            start_r_0 <= "0";
+
+            -- allow some propagation time
+            wait until rising_edge(ap_clk_0);
+            wait until rising_edge(ap_clk_0);
+
+            -- wait for FSM to leave IDLE
+            timeout := 0;
+            while (unsigned(dbg_phase_0) = 0) and (done_0(0) /= '1') loop
+                wait until rising_edge(ap_clk_0);
+                timeout := timeout + 1;
+                if timeout > 5000 then
+                    report "TIMEOUT waiting to leave IDLE. phase=" &
+                           integer'image(to_integer(unsigned(dbg_phase_0))) &
+                           " phase_text=" & slv64_to_ascii(dbg_phase_text_0) &
+                           " sample_id=" &
+                           integer'image(to_integer(unsigned(dbg_sample_id_0)))
+                           severity failure;
+                end if;
+            end loop;
+
+            -- wait for DONE
+            timeout := 0;
+            while done_0(0) /= '1' loop
+                wait until rising_edge(ap_clk_0);
+                timeout := timeout + 1;
+                if timeout > 30000 then
+                    report "TIMEOUT waiting for done. phase=" &
+                           integer'image(to_integer(unsigned(dbg_phase_0))) &
+                           " phase_text=" & slv64_to_ascii(dbg_phase_text_0) &
+                           " sample_id=" &
+                           integer'image(to_integer(unsigned(dbg_sample_id_0)))
+                           severity failure;
+                end if;
+            end loop;
+
+            print_debug_values(tag);
+
+            wait until rising_edge(ap_clk_0);
+        end procedure;
+
+    begin
+        rst_r_0      <= "1";
+        start_r_0    <= "0";
+        init_mode_0  <= "0";
+        train_mode_0 <= "0";
+        x1_0         <= F_0_0;
+        x2_0         <= F_0_0;
+        y_true_0     <= F_0_0;
+
+        wait for 50 ns;
+        wait until rising_edge(ap_clk_0);
+        wait until rising_edge(ap_clk_0);
+        wait until rising_edge(ap_clk_0);
+        wait until rising_edge(ap_clk_0);
+        rst_r_0 <= "0";
+
+        wait until rising_edge(ap_clk_0);
+        wait until rising_edge(ap_clk_0);
+        wait until rising_edge(ap_clk_0);
+        wait until rising_edge(ap_clk_0);
+
+        report "INIT START";
+        run_tx("1", "0", F_0_0, F_0_0, F_0_0, "INIT");
+        report "INIT DONE";
+
+        report "TRAINING START";
+        for e in 0 to 5999 loop
+            report "Epoch " & integer'image(e);
+
+            run_tx("0", "1", F_0_0, F_0_0, F_0_0, "TRAIN_00");
+            run_tx("0", "1", F_0_0, F_1_0, F_1_0, "TRAIN_01");
+            run_tx("0", "1", F_1_0, F_0_0, F_1_0, "TRAIN_10");
+            run_tx("0", "1", F_1_0, F_1_0, F_0_0, "TRAIN_11");
+        end loop;
+
+        report "FINAL INFERENCE";
+        run_tx("0", "0", F_0_0, F_0_0, F_0_0, "INFER_00");
+        run_tx("0", "0", F_0_0, F_1_0, F_0_0, "INFER_01");
+        run_tx("0", "0", F_1_0, F_0_0, F_0_0, "INFER_10");
+        run_tx("0", "0", F_1_0, F_1_0, F_0_0, "INFER_11");
+
+        report "FINAL WEIGHTS";
+        report "W1_00=0x" & slv32_to_hex(dbg_w1_00_0) &
+               " W1_10=0x" & slv32_to_hex(dbg_w1_10_0) &
+               " b1_0=0x"  & slv32_to_hex(dbg_b1_0_0) &
+               " W2_0=0x"  & slv32_to_hex(dbg_w2_0_0) &
+               " b2=0x"    & slv32_to_hex(dbg_b2_0);
+        report "SIM DONE";
+        wait;
+    end process;
+
+end behavior;
