@@ -21,5 +21,4 @@ This repository contains my current work on implementing and validating a small 
 
 - `hls/` → HLS source files and C testbenches
 - `vivado/` → VHDL testbenches and wrapper-related notes
-- `notebooks/` → Jupyter notebooks for verification
-- `docs/` → progress notes and task tracking
+- `jupyter/` → Jupyter notebooks for verification
