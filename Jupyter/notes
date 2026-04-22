@@ -1,0 +1,77 @@
+# Jupyter Notebook Notes
+
+## Purpose
+The Jupyter notebooks in this folder are used to validate the XOR learning model in Python before and alongside the HLS/Vivado implementation. They provide a software-side reference for forward propagation, training behavior, and final learned weights.
+
+## Main objectives
+The notebooks were created for the following purposes:
+
+- verify that the XOR problem can be learned in Python
+- compare Python/TensorFlow results with HLS/Vivado results
+- study the difference between floating-point and fixed-point training behavior
+- create a software validation flow before moving toward reinforcement learning implementation
+
+
+### Floating-point notebook
+This notebook uses floating-point arithmetic and is the closest software reference to the floating-point HLS version.
+
+Main characteristics:
+- uses known initial weights
+- uses the same XOR dataset as HLS
+- uses the same clipped linear sigmoid approximation
+- performs manual forward propagation and manual training updates
+- produces final weights and inference results that can be compared with Vivado floating-point outputs
+
+Observation:
+- floating-point Python/TensorFlow results matched the floating-point HLS/Vivado results closely
+
+## Dataset
+The XOR dataset used in the notebooks consists of four samples:
+
+- (0,0) -> 0
+- (0,1) -> 1
+- (1,0) -> 1
+- (1,1) -> 0
+
+The samples are processed in the same order as in the HLS/Vivado testbenches.
+
+## Network structure
+The software model uses the same structure as the HLS implementation:
+
+- 2 inputs
+- 4 hidden neurons
+- 1 output neuron
+
+Trainable parameters:
+- `W1` : input-to-hidden weights
+- `b1` : hidden-layer biases
+- `W2` : hidden-to-output weights
+- `b2` : output bias
+
+## Activation function
+The notebooks use the same simplified sigmoid approximation as the HLS code:
+
+- output = 0 if input < -4
+- output = 1 if input > 4
+- otherwise output = 0.5 + 0.125 * input
+
+This was chosen to keep the Python model aligned with the HLS implementation.
+
+## Training setup
+- learning rate: 0.3
+- known fixed initial weights used for comparison
+- epoch counts varied during experiments, including 2000 and 6000 epochs
+
+## Comparison with HLS/Vivado
+The notebooks were used to compare:
+
+- one forward pass
+- one training step
+- final XOR inference outputs
+- final visible weights
+
+Main conclusion:
+- floating-point HLS and Python matched closely
+- fixed-point HLS was harder to replicate exactly in Python
+
+These notebooks serve as the software-side rapid prototyping and validation stage. They are a preparation step for the later reinforcement learning implementation, where a TensorFlow-based algorithm will be developed first and then translated into HLS for FPGA execution.
